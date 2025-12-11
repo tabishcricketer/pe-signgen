@@ -6,6 +6,7 @@ symbol server, then generates cross-version compatible byte signatures
 for specified functions.
 
 """
+
 from __future__ import annotations
 
 __version__ = "0.3.0"
@@ -32,7 +33,6 @@ from .pe_parsing import parse_codeview, CodeViewRSDS, CodeViewNB10
 __all__ = [
     # Version
     "__version__",
-    
     # Exceptions
     "PESignGenError",
     "DownloadError",
@@ -44,7 +44,6 @@ __all__ = [
     "GitError",
     "CacheError",
     "InvalidFormatError",
-    
     # Core functions
     "generate_signature",
     "group_by_signature",
@@ -52,13 +51,11 @@ __all__ = [
     "find_function",
     "get_all_symbols",
     "download_all",
-    
     # Cache
     "SignatureCache",
     "BuildSignature",
     "load_cache",
     "save_cache",
-    
     # PE parsing
     "parse_codeview",
     "CodeViewRSDS",

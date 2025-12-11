@@ -1,4 +1,5 @@
 """HTTP utilities for pe-signgen."""
+
 from __future__ import annotations
 
 import os
@@ -41,15 +42,15 @@ def http_get(
 ) -> requests.Response:
     """
     Make an HTTP GET request.
-    
+
     Args:
         url: URL to fetch
         stream: Whether to stream the response
         timeout: Request timeout in seconds
-        
+
     Returns:
         Response object
-        
+
     Raises:
         DownloadError: If the request fails
     """
@@ -64,23 +65,21 @@ def http_get(
 def atomic_write(response: requests.Response, dest: Path) -> None:
     """
     Write response content to file atomically.
-    
+
     Uses a temporary file and atomic rename to prevent partial writes.
-    
+
     Args:
         response: HTTP response with content
         dest: Destination file path
-        
+
     Raises:
         DownloadError: If write fails
     """
     dest.parent.mkdir(parents=True, exist_ok=True)
-    
+
     try:
         with tempfile.NamedTemporaryFile(
-            delete=False,
-            dir=str(dest.parent),
-            suffix=".tmp"
+            delete=False, dir=str(dest.parent), suffix=".tmp"
         ) as tmp:
             tmp_path = Path(tmp.name)
             try:
@@ -92,7 +91,7 @@ def atomic_write(response: requests.Response, dest: Path) -> None:
             except Exception as e:
                 tmp_path.unlink(missing_ok=True)
                 raise DownloadError(f"Write failed: {e}") from e
-        
+
         # Atomic rename
         tmp_path.replace(dest)
     except OSError as e:
@@ -108,18 +107,18 @@ def download_file(
 ) -> None:
     """
     Download a file with retry logic.
-    
+
     Args:
         url: URL to download
         dest: Destination file path
         retries: Number of retry attempts
         expected_size: Expected file size (optional validation)
-        
+
     Raises:
         DownloadError: If download fails after all retries
     """
     last_error: Exception | None = None
-    
+
     for attempt in range(retries + 1):
         try:
             with http_get(url, stream=True) as response:
@@ -127,10 +126,12 @@ def download_file(
                 if content_length and content_length.isdigit():
                     expected = int(content_length)
                 else:
+                    if expected_size is None:
+                        raise DownloadError(f"Unknown expected_size url: {url}")
                     expected = expected_size
-                
+
                 atomic_write(response, dest)
-                
+
                 # Validate size if known
                 if expected is not None:
                     actual_size = dest.stat().st_size
@@ -139,13 +140,13 @@ def download_file(
                             f"Truncated download: got {actual_size}, expected {expected}"
                         )
                 return
-                
+
         except Exception as e:
             last_error = e
             if attempt < retries:
                 sleep_time = min(2 ** (attempt + 1), 10)
                 time.sleep(sleep_time)
-    
+
     raise DownloadError(f"Download failed after {retries + 1} attempts: {last_error}")
 
 

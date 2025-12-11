@@ -86,7 +86,6 @@ The **core idea of the project** is to provide a **systematic, robust way to acc
 ### Architecture Support
 
 * x64 (AMD64)
-* x86 (32-bit)
 * ARM64 (AArch64)
 * WoW64 (x86 on x64)
 
@@ -101,10 +100,19 @@ The **core idea of the project** is to provide a **systematic, robust way to acc
 * Internet connection
 * Sufficient disk space (first run may download several GB)
 
+
+### Install from Pip 
+
+```bash
+pip install pe-signgen
+```
+
+
+
 ### Install from Source
 
 ```bash
-git clone https://github.com/yourusername/pe-signgen.git
+git clone https://github.com/forentfraps/pe-signgen.git
 cd pe-signgen
 pip install -r requirements.txt
 pip install -e .
@@ -306,11 +314,10 @@ export PE_SIGNGEN_CACHE=/custom/path
 ## Development
 
 ```bash
-git clone https://github.com/yourusername/pe-signgen.git
+git clone https://github.com/forentfraps/pe-signgen.git
 cd pe-signgen
 pip install -e .
-pip install pytest black mypy
-pytest
+pip install black mypy
 black pe_signgen/
 mypy pe_signgen/
 ```
@@ -336,7 +343,7 @@ MIT License – see [LICENSE](LICENSE).
 
 * Winbindex – build metadata
 * pefile – PE parsing
-* winpdb-rs – PDB parsing
+* winpdb-rs – My PDB parsing python bindings
 
 Inspired by the need for robust signature generation for internal Windows APIs.
 

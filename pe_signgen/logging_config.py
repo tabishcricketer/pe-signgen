@@ -1,4 +1,5 @@
 """Logging configuration for pe-signgen."""
+
 from __future__ import annotations
 
 import logging
@@ -15,7 +16,7 @@ _print_lock = threading.Lock()
 def setup_logging(verbose: bool = False, quiet: bool = False) -> None:
     """
     Configure logging for pe-signgen.
-    
+
     Args:
         verbose: Enable debug output
         quiet: Suppress all output except errors
@@ -26,12 +27,10 @@ def setup_logging(verbose: bool = False, quiet: bool = False) -> None:
         level = logging.DEBUG
     else:
         level = logging.INFO
-    
+
     handler = logging.StreamHandler(sys.stderr)
-    handler.setFormatter(logging.Formatter(
-        "[%(levelname).1s] %(message)s"
-    ))
-    
+    handler.setFormatter(logging.Formatter("[%(levelname).1s] %(message)s"))
+
     logger.setLevel(level)
     logger.handlers.clear()
     logger.addHandler(handler)

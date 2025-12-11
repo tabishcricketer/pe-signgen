@@ -3,6 +3,7 @@
 This module provides the main CLI entry point and command implementations
 for generating binary signatures and offsets from Windows PE files.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -40,10 +41,10 @@ from .versioning import parse_version, get_version_cap_for_os
 def _signature_worker(job: SignatureJob) -> SignatureResult:
     """
     Worker function for signature generation.
-    
+
     Args:
         job: SignatureJob containing all parameters
-        
+
     Returns:
         SignatureResult with success or error information
     """
@@ -97,10 +98,10 @@ def _signature_worker(job: SignatureJob) -> SignatureResult:
 def _offset_worker(job: OffsetJob) -> OffsetResult:
     """
     Worker function for offset generation.
-    
+
     Args:
         job: OffsetJob containing all parameters
-        
+
     Returns:
         OffsetResult with success or error information
     """
@@ -218,29 +219,34 @@ def cmd_signatures(
                 pass
 
         pdb_path = pdb_dir / f"{build}.pdb"
-        to_compute.append(SignatureJob(
-            dll_path=dll_path,
-            pdb_path=pdb_path,
-            func_name=func_name,
-            min_length=min_len,
-            max_length=max_len,
-        ))
+        to_compute.append(
+            SignatureJob(
+                dll_path=dll_path,
+                pdb_path=pdb_path,
+                func_name=func_name,
+                min_length=min_len,
+                max_length=max_len,
+            )
+        )
 
     # Compute new signatures
     if to_compute:
         log_info(f"Computing {len(to_compute)} signatures...")
-        
+
         worker_count = max(1, workers)
-        
+
         with ProgressBar(len(to_compute), enabled=show_progress) as progress:
             with ProcessPoolExecutor(max_workers=worker_count) as executor:
-                futures = [executor.submit(_signature_worker, job) for job in to_compute]
+                futures = [
+                    executor.submit(_signature_worker, job) for job in to_compute
+                ]
 
                 for future in as_completed(futures):
                     result = future.result()
 
-                    if result.success:
-                        results[result.build] = result.as_tuple()
+                    result_tuple = result.as_tuple()
+                    if result.success and result_tuple is not None:
+                        results[result.build] = result_tuple
                         progress.update(success=True)
                     else:
                         errors[result.build] = result.error or "Unknown error"
@@ -282,9 +288,15 @@ def cmd_signatures(
         elif output_format == "all":
             base = output.stem
             parent = output.parent
-            write_wsig(dll_name, func_name, arch, results, groups, parent / f"{base}.wsig")
-            write_json(dll_name, func_name, arch, results, groups, parent / f"{base}.json")
-            write_wsig_header(dll_name, func_name, arch, results, groups, parent / f"{base}.h")
+            write_wsig(
+                dll_name, func_name, arch, results, groups, parent / f"{base}.wsig"
+            )
+            write_json(
+                dll_name, func_name, arch, results, groups, parent / f"{base}.json"
+            )
+            write_wsig_header(
+                dll_name, func_name, arch, results, groups, parent / f"{base}.h"
+            )
         log_info(f"Output written to {output}")
     else:
         for sig in sorted(groups.keys()):
@@ -344,21 +356,23 @@ def cmd_offsets(
                 pass
 
         pdb_path = pdb_dir / f"{build}.pdb"
-        jobs.append(OffsetJob(
-            dll_path=dll_path,
-            pdb_path=pdb_path,
-            func_name=func_name,
-        ))
+        jobs.append(
+            OffsetJob(
+                dll_path=dll_path,
+                pdb_path=pdb_path,
+                func_name=func_name,
+            )
+        )
 
     # Compute offsets
     results: dict[str, tuple[int, int, str]] = {}
     errors: dict[str, str] = {}
 
     log_info(f"Computing {len(jobs)} offsets...")
-    
+
     # Use at least 1 worker
     worker_count = max(1, workers)
-    
+
     with ProgressBar(len(jobs), enabled=show_progress) as progress:
         with ProcessPoolExecutor(max_workers=worker_count) as executor:
             futures = [executor.submit(_offset_worker, job) for job in jobs]
@@ -398,13 +412,13 @@ def cmd_offsets(
 def main(argv: list[str] | None = None) -> int:
     """
     Main entry point for pe-signgen CLI.
-    
+
     Generates binary signatures or offsets for Windows PE functions
     across multiple Windows versions using winbindex data and symbol servers.
-    
+
     Args:
         argv: Command-line arguments (default: sys.argv[1:])
-        
+
     Returns:
         Exit code (0 for success, non-zero for error)
     """
@@ -587,9 +601,11 @@ For more information, visit: https://github.com/forentfraps/pe-signgen
 
     if args.os_version:
         if args.min_version or args.max_version:
-            log_error("--os-version cannot be combined with --min-version or --max-version")
+            log_error(
+                "--os-version cannot be combined with --min-version or --max-version"
+            )
             return 1
-        
+
         os_ver = parse_version(args.os_version)
         if not os_ver:
             log_error(f"Invalid OS version: {args.os_version}")

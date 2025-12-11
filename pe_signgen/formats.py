@@ -57,7 +57,7 @@ class BinaryBuilder:
 
     def patch(self, offset: int, data: bytes) -> None:
         """Patch data at specific offset."""
-        self.buffer[offset:offset + len(data)] = data
+        self.buffer[offset : offset + len(data)] = data
 
 
 def _build_key(build: str) -> tuple[int, int]:
@@ -87,7 +87,7 @@ def _format_c_byte_array(
 
     lines: list[str] = []
     for i in range(0, len(data), bytes_per_line):
-        chunk = data[i:i + bytes_per_line]
+        chunk = data[i : i + bytes_per_line]
         chunk_txt = ", ".join(f"0x{b:02X}" for b in chunk)
         lines.append(f"{indent}{chunk_txt}")
 
@@ -177,7 +177,9 @@ def write_wsig(
     # Sort groups by earliest build
     sorted_groups = sorted(
         groups.items(),
-        key=lambda kv: _build_key(min(kv[1], key=_build_key)) if kv[1] else (999999, 999999)
+        key=lambda kv: (
+            _build_key(min(kv[1], key=_build_key)) if kv[1] else (999999, 999999)
+        ),
     )
 
     group_meta: list[tuple[int, int, int, int, int, int]] = []
@@ -197,11 +199,9 @@ def write_wsig(
 
         builds_off = bb.write(builds_data)
 
-        group_meta.append((
-            sig_off, len(pattern),
-            mask_off, len(mask),
-            builds_off, len(builds_sorted)
-        ))
+        group_meta.append(
+            (sig_off, len(pattern), mask_off, len(mask), builds_off, len(builds_sorted))
+        )
 
     bb.align(4)
     groups_off = bb.tell()
@@ -209,9 +209,12 @@ def write_wsig(
     for sig_off, sig_len, mask_off, mask_len, builds_off, build_cnt in group_meta:
         bb.write_struct(
             WSIG_GROUP_FORMAT,
-            sig_off, sig_len,
-            mask_off, mask_len,
-            builds_off, build_cnt
+            sig_off,
+            sig_len,
+            mask_off,
+            mask_len,
+            builds_off,
+            build_cnt,
         )
 
     header = struct.pack(
@@ -219,10 +222,12 @@ def write_wsig(
         WSIG_MAGIC,
         FORMAT_VERSION,
         arch_code,
-        dll_off, len(dll_bytes),
-        func_off, len(func_bytes),
+        dll_off,
+        len(dll_bytes),
+        func_off,
+        len(func_bytes),
         len(group_meta),
-        groups_off
+        groups_off,
     )
     bb.patch(0, header)
 
@@ -305,22 +310,19 @@ def write_woff(
         major, minor = _build_key(build)
         m_off, m_len = matched_meta[idx]
 
-        bb.write_struct(
-            WOFF_ENTRY_FORMAT,
-            major, minor,
-            rva, file_off,
-            m_off, m_len
-        )
+        bb.write_struct(WOFF_ENTRY_FORMAT, major, minor, rva, file_off, m_off, m_len)
 
     header = struct.pack(
         WOFF_HEADER_FORMAT,
         WOFF_MAGIC,
         FORMAT_VERSION,
         arch_code,
-        dll_off, len(dll_bytes),
-        func_off, len(func_bytes),
+        dll_off,
+        len(dll_bytes),
+        func_off,
+        len(func_bytes),
         len(builds_sorted),
-        entries_off
+        entries_off,
     )
     bb.patch(0, header)
 
@@ -328,6 +330,7 @@ def write_woff(
 
 
 # JSON Export
+
 
 def write_json(
     dll: str,
@@ -350,7 +353,9 @@ def write_json(
     """
     sorted_groups = sorted(
         groups.items(),
-        key=lambda kv: _build_key(min(kv[1], key=_build_key)) if kv[1] else (999999, 999999)
+        key=lambda kv: (
+            _build_key(min(kv[1], key=_build_key)) if kv[1] else (999999, 999999)
+        ),
     )
 
     data = {
@@ -360,7 +365,7 @@ def write_json(
         "generated": datetime.now().isoformat(),
         "total_builds": len(results),
         "unique_signatures": len(groups),
-        "signature_groups": []
+        "signature_groups": [],
     }
 
     for sig, builds in sorted_groups:
@@ -371,24 +376,23 @@ def write_json(
         versions = []
         for build in builds_sorted:
             major, minor = _build_key(build)
-            versions.append({
-                "major": major,
-                "minor": minor,
-                "build": build
-            })
+            versions.append({"major": major, "minor": minor, "build": build})
 
-        data["signature_groups"].append({
-            "matched_symbol": matched,
-            "signature": sig,
-            "length": length,
-            "build_count": len(builds),
-            "versions": versions
-        })
+        data["signature_groups"].append(
+            {
+                "matched_symbol": matched,
+                "signature": sig,
+                "length": length,
+                "build_count": len(builds),
+                "versions": versions,
+            }
+        )
 
     output.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
 # C Header Export
+
 
 def write_wsig_header(
     dll: str,
@@ -432,7 +436,9 @@ def write_wsig_header(
     """
     sorted_groups = sorted(
         groups.items(),
-        key=lambda kv: _build_key(min(kv[1], key=_build_key)) if kv[1] else (999999, 999999)
+        key=lambda kv: (
+            _build_key(min(kv[1], key=_build_key)) if kv[1] else (999999, 999999)
+        ),
     )
 
     dll_c = _c_escape_string(dll)
@@ -532,6 +538,7 @@ def write_wsig_header(
     lines.append(f"#endif /* {guard} */\n")
 
     output.write_text("".join(lines), encoding="utf-8")
+
 
 def write_woff_header(
     dll: str,
