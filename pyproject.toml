@@ -1,0 +1,81 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pe-signgen"
+version = "0.3.0"
+description = "Generate unique byte signatures for Windows PE functions"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+keywords = ["windows", "pe", "signatures", "pdb", "symbols", "reverse-engineering"]
+
+dependencies = [
+    "pefile>=2023.2.7",
+    "requests>=2.28.0",
+    "winpdb-rs>=0.1.0",
+]
+
+[project.optional-dependencies]
+native = ["pdb_native"]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "mypy>=1.0",
+    "black>=23.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+pe-signgen = "pe_signgen.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/forentfraps/pe-signgen"
+Documentation = "https://github.com/forentfraps/pe-signgen#readme"
+Repository = "https://github.com/forentfraps/pe-signgen"
+Issues = "https://github.com/forentfraps/pe-signgen/issues"
+
+[tool.setuptools.packages.find]
+include = ["pe_signgen", "pe_signgen.*"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+]
+
+[tool.ruff.isort]
+known-first-party = ["pe_signgen"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --cov=pe_signgen --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["pe_signgen"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]
