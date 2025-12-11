@@ -1,2 +1,5 @@
 dist/
 *.pyc
+pe_signgen.egg-info/
+.mypy_cache/
+

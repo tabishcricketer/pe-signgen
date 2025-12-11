@@ -1,2 +1,0 @@
-[console_scripts]
-pe-signgen = pe_signgen.cli:main
